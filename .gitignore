@@ -1,0 +1,5 @@
+node_modules/
+data/auth.json
+data/cv-data.json
+public/uploads/profile.*
+*.zip

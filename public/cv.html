@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chantrea MEAS — Digital CV</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#d4a574;--gold-light:#e8c99b;--primary:#6c5ce7;--primary-light:#a29bfe;--accent:#00cec9;--bg:#0a0a0f;--bg2:#12121a;--card:#1a1a2e;--text:#e0e0e0;--text-dim:#8892b0;--text-bright:#fff;--gradient-gold:linear-gradient(135deg,#d4a574,#e8c99b);--border:rgba(108,92,231,0.15)}
+html{scroll-behavior:smooth}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+.loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s}.loader.hidden{opacity:0;pointer-events:none}
+.loader-spinner{width:50px;height:50px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.cursor-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999}
+.cursor-ring{width:36px;height:36px;border:2px solid var(--gold-light);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .15s ease-out}
+.cursor-ring.hover{transform:scale(1.5);border-color:var(--accent)}
+@media(max-width:768px){.cursor-dot,.cursor-ring{display:none}}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.scroll-progress{position:fixed;top:0;left:0;height:3px;background:var(--gradient-gold);z-index:1000;transition:width .1s}
+nav{position:fixed;top:0;width:100%;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(20px);background:rgba(10,10,15,.7);border-bottom:1px solid var(--border);transition:all .3s}
+nav.scrolled{padding:.6rem 2rem;background:rgba(10,10,15,.95)}
+nav .logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;background:var(--gradient-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav .nav-links{display:flex;gap:2rem;list-style:none}
+nav .nav-links a{color:var(--text-dim);text-decoration:none;font-size:.85rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;transition:color .3s;position:relative}
+nav .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--gold);transition:width .3s}
+nav .nav-links a:hover{color:var(--text-bright)}nav .nav-links a:hover::after{width:100%}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:200}.hamburger span{width:25px;height:2px;background:var(--text);transition:.3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}.hamburger.active span:nth-child(2){opacity:0}.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+@media(max-width:768px){.hamburger{display:flex}nav .nav-links{position:fixed;top:0;right:-100%;width:60%;height:100vh;background:var(--bg2);flex-direction:column;justify-content:center;align-items:center;gap:2rem;transition:.4s}nav .nav-links.open{right:0}}
+main{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.25;animation:float 8s ease-in-out infinite}
+.hero-bg-orb:nth-child(1){width:400px;height:400px;background:var(--gold);top:10%;left:10%}
+.hero-bg-orb:nth-child(2){width:300px;height:300px;background:var(--primary);bottom:10%;right:15%;animation-delay:-4s}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+.hero-content{text-align:center;max-width:800px}
+.hero-avatar{width:160px;height:160px;border-radius:50%;margin:0 auto 2rem;background:var(--gradient-gold);display:flex;align-items:center;justify-content:center;font-size:3.2rem;font-family:'Playfair Display',serif;color:#1a1a2e;box-shadow:0 0 60px rgba(212,165,116,.4);animation:pulse-glow 3s ease-in-out infinite;position:relative;overflow:hidden}
+.hero-avatar img{width:100%;height:100%;object-fit:cover}
+.hero-avatar::after{content:'';position:absolute;inset:-4px;border-radius:50%;animation:spin 6s linear infinite;box-shadow:0 0 0 2px var(--gold),0 0 0 4px var(--bg),0 0 0 6px var(--primary)}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 60px rgba(212,165,116,.4)}50%{box-shadow:0 0 80px rgba(212,165,116,.6)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--text-bright);margin-bottom:.5rem}
+.hero .tagline{font-size:1.2rem;color:var(--gold-light);font-weight:300;letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5rem}
+.hero .summary{font-size:1.05rem;color:var(--text-dim);max-width:600px;margin:0 auto 2.5rem}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{padding:.8rem 2rem;border-radius:50px;font-size:.9rem;font-weight:600;text-decoration:none;cursor:pointer;transition:all .3s;border:none;letter-spacing:.5px}
+.btn-primary{background:var(--gradient-gold);color:#1a1a2e;box-shadow:0 4px 20px rgba(212,165,116,.4)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(212,165,116,.6)}
+.btn-outline{background:transparent;color:var(--gold-light);border:2px solid var(--gold)}.btn-outline:hover{background:rgba(212,165,116,.1);transform:translateY(-2px)}
+.section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:3.5rem}
+.section-header h2{font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--text-bright);margin-bottom:.5rem}
+.section-header .subtitle{color:var(--gold-light);font-size:.95rem;letter-spacing:2px;text-transform:uppercase}
+.section-header .line{width:60px;height:3px;background:var(--gradient-gold);margin:1rem auto 0;border-radius:2px}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s}.reveal.visible{opacity:1;transform:translateY(0)}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:768px){.profile-grid{grid-template-columns:1fr}}
+.profile-text p{color:var(--text-dim);margin-bottom:1.5rem}
+.info-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;transition:all .3s}
+.info-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 8px 30px rgba(212,165,116,.15)}
+.info-card .label{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem}
+.info-card .value{font-size:1rem;color:var(--text-bright);font-weight:500}
+.info-card .value a{color:var(--gold-light);text-decoration:none}
+.stats-row{display:flex;justify-content:center;gap:3rem;margin-top:3rem;flex-wrap:wrap}
+.stat-item{text-align:center}.stat-number{font-size:2.5rem;font-weight:700;background:var(--gradient-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.skills-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
+.skill-category{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;transition:all .3s}
+.skill-category:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 10px 40px rgba(212,165,116,.1)}
+.skill-category h3{font-size:1.1rem;color:var(--gold-light);margin-bottom:1.5rem;font-weight:600;display:flex;align-items:center;gap:.5rem}
+.skill-item{margin-bottom:1.2rem}.skill-item .skill-header{display:flex;justify-content:space-between;margin-bottom:.4rem}
+.skill-item .skill-name{font-size:.9rem;color:var(--text)}.skill-item .skill-pct{font-size:.8rem;color:var(--text-dim)}
+.skill-bar{height:6px;background:rgba(212,165,116,.1);border-radius:3px;overflow:hidden}
+.skill-bar-fill{height:100%;border-radius:3px;background:var(--gradient-gold);width:0;transition:width 1.2s ease-out}
+.tech-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2rem;justify-content:center}
+.tech-tag{padding:.4rem 1rem;border-radius:50px;background:rgba(212,165,116,.1);border:1px solid var(--border);color:var(--gold-light);font-size:.8rem;transition:all .3s}
+.tech-tag:hover{background:rgba(212,165,116,.25);border-color:var(--gold);transform:translateY(-2px)}
+.timeline{position:relative;padding-left:3rem}
+.timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--gold),var(--accent))}
+.timeline-item{position:relative;margin-bottom:3rem}
+.timeline-dot{position:absolute;left:-2.4rem;top:.3rem;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--bg);box-shadow:0 0 15px rgba(212,165,116,.5)}
+.timeline-item .date{font-size:.8rem;color:var(--accent);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem}
+.timeline-item h3{font-size:1.2rem;color:var(--text-bright);margin-bottom:.3rem}
+.timeline-item .company{font-size:.95rem;color:var(--gold-light);margin-bottom:1rem}
+.timeline-item ul{list-style:none;padding-left:0}
+.timeline-item ul li{color:var(--text-dim);font-size:.9rem;padding-left:1.2rem;position:relative;margin-bottom:.6rem}
+.timeline-item ul li::before{content:'\25b9';position:absolute;left:0;color:var(--gold)}
+.education-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.edu-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden;transition:all .3s}
+.edu-card:hover{border-color:var(--gold);transform:translateY(-4px)}
+.edu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-gold)}
+.edu-card .edu-year{font-size:.8rem;color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:.8rem}
+.edu-card h3{font-size:1.15rem;color:var(--text-bright);margin-bottom:.3rem}
+.edu-card .school{font-size:.95rem;color:var(--gold-light);margin-bottom:.8rem}
+.edu-card p{font-size:.85rem;color:var(--text-dim)}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.cert-card{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;transition:all .3s}
+.cert-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.cert-icon{width:44px;height:44px;border-radius:10px;background:rgba(212,165,116,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.cert-card .cert-name{font-size:.9rem;color:var(--text-bright);font-weight:500}
+.cert-card .cert-org{font-size:.75rem;color:var(--text-dim)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;transition:all .4s;overflow:hidden}
+.project-card:hover{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 15px 40px rgba(212,165,116,.15)}
+.project-card .project-icon{font-size:2rem;margin-bottom:1rem}
+.project-card h3{font-size:1.15rem;color:var(--text-bright);margin-bottom:.5rem}
+.project-card p{font-size:.85rem;color:var(--text-dim);margin-bottom:1rem}
+.project-card .tech-stack{display:flex;flex-wrap:wrap;gap:.4rem}
+.project-card .tech-stack span{padding:.2rem .6rem;border-radius:4px;background:rgba(0,206,201,.1);color:var(--accent);font-size:.75rem;font-weight:500}
+.languages-grid{display:flex;justify-content:center;flex-wrap:wrap;gap:1.5rem}
+.lang-item{text-align:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;min-width:120px;transition:all .3s}
+.lang-item:hover{border-color:var(--gold);transform:translateY(-3px)}
+.lang-item .lang-name{font-size:1rem;color:var(--text-bright);font-weight:500;margin-bottom:.3rem}
+.lang-item .lang-level{font-size:.75rem;color:var(--gold-light)}
+.lang-dots{display:flex;gap:4px;justify-content:center;margin-top:.5rem}
+.lang-dot{width:8px;height:8px;border-radius:50%;background:rgba(212,165,116,.2)}.lang-dot.filled{background:var(--gold)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:768px){.contact-grid{grid-template-columns:1fr}}
+.contact-info{display:flex;flex-direction:column;gap:1.5rem}
+.contact-item{display:flex;align-items:center;gap:1rem;padding:1.2rem;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all .3s}
+.contact-item:hover{border-color:var(--gold);transform:translateX(4px)}
+.contact-item .contact-icon{width:44px;height:44px;border-radius:10px;background:rgba(212,165,116,.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.contact-item .contact-label{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.contact-item .contact-value{font-size:.95rem;color:var(--text-bright)}
+.contact-item .contact-value a{color:var(--gold-light);text-decoration:none}
+.contact-form{display:flex;flex-direction:column;gap:1rem}
+.form-group{position:relative}
+.form-group input,.form-group textarea{width:100%;padding:1rem;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;transition:border-color .3s;outline:none}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group label{position:absolute;left:1rem;top:1rem;color:var(--text-dim);font-size:.9rem;pointer-events:none;transition:.3s}
+.form-group input:focus~label,.form-group input:not(:placeholder-shown)~label,.form-group textarea:focus~label,.form-group textarea:not(:placeholder-shown)~label{top:-.6rem;left:.8rem;font-size:.7rem;color:var(--gold-light);background:var(--card);padding:0 .3rem;border-radius:3px}
+.form-group textarea{min-height:120px;resize:vertical}
+.form-success{display:none;color:var(--accent);font-size:.9rem;margin-top:.5rem}
+.download-cv{position:fixed;bottom:2rem;right:2rem;z-index:90;width:56px;height:56px;border-radius:50%;background:var(--gradient-gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#1a1a2e;box-shadow:0 4px 20px rgba(212,165,116,.5);transition:all .3s}
+.download-cv:hover{transform:scale(1.1);box-shadow:0 6px 30px rgba(212,165,116,.7)}
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border)}
+footer .social-links{display:flex;justify-content:center;gap:1.5rem;margin-bottom:1.5rem}
+footer .social-links a{width:42px;height:42px;border-radius:10px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .3s;text-decoration:none}
+footer .social-links a:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 4px 15px rgba(212,165,116,.3)}
+footer p{font-size:.8rem;color:var(--text-dim)}footer .heart{color:var(--gold)}
+@media print{nav,.cursor-dot,.cursor-ring,#particles,.scroll-progress,.download-cv,footer .social-links{display:none}body{background:#fff;color:#333}.hero{min-height:auto;padding:2rem}.hero-bg-orb{display:none}.section{padding:2rem}}
+</style>
+</head>
+<body>
+<div class="loader" id="loader"><div class="loader-spinner"></div></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<canvas id="particles"></canvas>
+<button class="download-cv" title="Download CV" onclick="window.print()">📄</button>
+<nav id="navbar">
+  <div class="logo" id="navLogo">CM</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#profile">Profile</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#projects">Achievements</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<main id="mainContent"></main>
+<footer id="footer"></footer>
+<script>
+/* Particles */
+var canvas=document.getElementById('particles'),ctx=canvas.getContext('2d'),particles=[],mouse={x:-999,y:-999};
+function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight}resizeCanvas();addEventListener('resize',resizeCanvas);
+function Particle(){this.reset=function(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.sz=Math.random()*2+.5;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.o=Math.random()*.5+.1};this.update=function(){this.x+=this.vx;this.y+=this.vy;var dx=mouse.x-this.x,dy=mouse.y-this.y;if(Math.sqrt(dx*dx+dy*dy)<120){this.x-=dx*.01;this.y-=dy*.01}if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.reset()};this.draw=function(){ctx.beginPath();ctx.arc(this.x,this.y,this.sz,0,Math.PI*2);ctx.fillStyle='rgba(212,165,116,'+this.o+')';ctx.fill()};this.reset()}
+for(var i=0;i<80;i++)particles.push(new Particle());
+function connectP(){for(var i=0;i<particles.length;i++)for(var j=i+1;j<particles.length;j++){var d=Math.sqrt(Math.pow(particles[i].x-particles[j].x,2)+Math.pow(particles[i].y-particles[j].y,2));if(d<120){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle='rgba(212,165,116,'+(0.08*(1-d/120))+')';ctx.stroke()}}}
+function animP(){ctx.clearRect(0,0,canvas.width,canvas.height);for(var i=0;i<particles.length;i++){particles[i].update();particles[i].draw()}connectP();requestAnimationFrame(animP)}animP();
+
+/* Cursor */
+var dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+document.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=(e.clientX-4)+'px';dot.style.top=(e.clientY-4)+'px';ring.style.left=(e.clientX-18)+'px';ring.style.top=(e.clientY-18)+'px'});
+function bindHovers(){var els=document.querySelectorAll('a,button,.btn,.info-card,.skill-category,.project-card,.edu-card,.cert-card,.lang-item,.contact-item,.tech-tag');for(var i=0;i<els.length;i++){els[i].addEventListener('mouseenter',function(){ring.classList.add('hover')});els[i].addEventListener('mouseleave',function(){ring.classList.remove('hover')})}}
+
+/* Scroll progress + navbar */
+var prog=document.getElementById('scrollProgress');
+addEventListener('scroll',function(){prog.style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight))*100+'%';document.getElementById('navbar').classList.toggle('scrolled',scrollY>50)});
+
+/* Hamburger */
+document.getElementById('hamburger').addEventListener('click',function(){this.classList.toggle('active');document.getElementById('navLinks').classList.toggle('open')});
+var navAnchors=document.querySelectorAll('#navLinks a');
+for(var i=0;i<navAnchors.length;i++){navAnchors[i].addEventListener('click',function(){document.getElementById('hamburger').classList.remove('active');document.getElementById('navLinks').classList.remove('open')})}
+
+/* Reveal observer */
+var rObs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
+var sObs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var bars=e.target.querySelectorAll('.skill-bar-fill');for(var i=0;i<bars.length;i++)bars[i].style.width=bars[i].dataset.width+'%'}})},{threshold:0.2});
+var cObs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.querySelectorAll('.stat-number').forEach(function(c){var t=parseInt(c.dataset.target);var n=0;var step=t/125;var tm=setInterval(function(){n+=step;if(n>=t){n=t;clearInterval(tm)}c.textContent=Math.floor(n)+(c.dataset.suffix||'')},16)});cObs.unobserve(e.target)}})},{threshold:0.5});
+
+function initObservers(){document.querySelectorAll('.reveal').forEach(function(el){rObs.observe(el)});document.querySelectorAll('.skill-category').forEach(function(el){sObs.observe(el)});document.querySelectorAll('.stats-row').forEach(function(el){cObs.observe(el)})}
+
+/* HTML escape */
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+
+/* Build CV from API */
+async function buildCV(){
+  var data;
+  try{var r=await fetch('/api/cv');data=await r.json()}catch(e){
+    document.getElementById('mainContent').innerHTML='<div style="text-align:center;padding:5rem 2rem"><h2 style="color:var(--gold-light)">Could not load CV data</h2><p style="color:var(--text-dim)">Please ensure the server is running.</p></div>';
+    document.getElementById('loader').classList.add('hidden');return}
+
+  var p=data.personal||{},ini=(p.firstName||'')[0]+(p.lastName||'')[0];
+  document.getElementById('navLogo').textContent=ini;
+  document.title=esc(p.firstName)+' '+esc(p.lastName)+' \u2014 Digital CV';
+
+  var h='';
+
+  /* Hero */
+  h+='<section class="hero" id="hero"><div class="hero-bg-orb"></div><div class="hero-bg-orb"></div><div class="hero-content reveal">';
+  h+='<div class="hero-avatar">';
+  if(p.profilePhoto)h+='<img src="'+esc(p.profilePhoto)+'" alt="'+esc(p.firstName)+'">';
+  else h+=esc(ini);
+  h+='</div>';
+  h+='<h1>'+esc(p.firstName)+' '+esc(p.lastName)+'</h1>';
+  h+='<div class="tagline">'+esc(p.title)+'</div>';
+  h+='<p class="summary">'+esc(p.summary)+'</p>';
+  h+='<div class="hero-cta"><a href="#contact" class="btn btn-primary">Get In Touch</a><a href="#projects" class="btn btn-outline">Key Achievements</a></div></div></section>';
+
+  /* Profile */
+  h+='<section class="section" id="profile"><div class="section-header reveal"><h2>Profile</h2><div class="subtitle">About Me</div><div class="line"></div></div>';
+  h+='<div class="profile-grid"><div class="profile-text reveal">';
+  var abouts=p.about||[];
+  for(var i=0;i<abouts.length;i++)h+='<p>'+esc(abouts[i])+'</p>';
+  h+='</div><div class="info-cards reveal">';
+  h+='<div class="info-card"><div class="label">Location</div><div class="value">'+esc(p.location)+'</div></div>';
+  h+='<div class="info-card"><div class="label">Email</div><div class="value"><a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a></div></div>';
+  h+='<div class="info-card"><div class="label">Phone</div><div class="value">'+esc(p.phone)+'</div></div>';
+  h+='<div class="info-card"><div class="label">Availability</div><div class="value">'+esc(p.availability)+'</div></div>';
+  var linkedinShort=(p.linkedin||'').replace('https://','');
+  h+='<div class="info-card"><div class="label">LinkedIn</div><div class="value"><a href="'+esc(p.linkedin)+'" target="_blank">'+esc(linkedinShort)+'</a></div></div>';
+  h+='<div class="info-card"><div class="label">Specialization</div><div class="value">'+esc(p.specialization)+'</div></div>';
+  h+='</div></div>';
+  h+='<div class="stats-row reveal">';
+  var stats=data.stats||[];
+  for(var i=0;i<stats.length;i++)h+='<div class="stat-item"><div class="stat-number" data-target="'+stats[i].value+'" data-suffix="'+(stats[i].suffix||'')+'">0</div><div class="stat-label">'+esc(stats[i].label)+'</div></div>';
+  h+='</div></section>';
+
+  /* Skills */
+  h+='<section class="section" id="skills"><div class="section-header reveal"><h2>Skills</h2><div class="subtitle">Technical &amp; Leadership Expertise</div><div class="line"></div></div>';
+  h+='<div class="skills-container">';
+  var skills=data.skills||[];
+  for(var i=0;i<skills.length;i++){var cat=skills[i];
+    h+='<div class="skill-category reveal"><h3><span class="icon">'+cat.icon+'</span> '+esc(cat.category)+'</h3>';
+    var items=cat.items||[];
+    for(var j=0;j<items.length;j++){var sk=items[j];
+      h+='<div class="skill-item"><div class="skill-header"><span class="skill-name">'+esc(sk.name)+'</span><span class="skill-pct">'+sk.level+'%</span></div><div class="skill-bar"><div class="skill-bar-fill" data-width="'+sk.level+'"></div></div></div>';}
+    h+='</div>';}
+  h+='</div>';
+  h+='<div class="tech-tags reveal">';
+  var tags=data.techTags||[];
+  for(var i=0;i<tags.length;i++)h+='<span class="tech-tag">'+esc(tags[i])+'</span>';
+  h+='</div></section>';
+
+  /* Experience */
+  h+='<section class="section" id="experience"><div class="section-header reveal"><h2>Experience</h2><div class="subtitle">Professional Journey</div><div class="line"></div></div>';
+  h+='<div class="timeline">';
+  var exps=data.experience||[];
+  for(var i=0;i<exps.length;i++){var exp=exps[i];
+    h+='<div class="timeline-item reveal"><div class="timeline-dot"></div><div class="date">'+esc(exp.date)+'</div><h3>'+esc(exp.title)+'</h3><div class="company">'+esc(exp.company)+'</div><ul>';
+    var bullets=exp.bullets||[];
+    for(var j=0;j<bullets.length;j++)h+='<li>'+esc(bullets[j])+'</li>';
+    h+='</ul></div>';}
+  h+='</div></section>';
+
+  /* Education */
+  h+='<section class="section" id="education"><div class="section-header reveal"><h2>Education</h2><div class="subtitle">Academic Background</div><div class="line"></div></div>';
+  h+='<div class="education-grid">';
+  var edus=data.education||[];
+  for(var i=0;i<edus.length;i++){var e=edus[i];
+    h+='<div class="edu-card reveal"><div class="edu-year">'+esc(e.year)+'</div><h3>'+esc(e.degree)+'</h3><div class="school">'+esc(e.school)+'</div><p>'+esc(e.description)+'</p></div>';}
+  h+='</div>';
+  h+='<div class="section-header reveal" style="margin-top:3rem"><h2 style="font-size:1.8rem">Certifications</h2><div class="line"></div></div>';
+  h+='<div class="cert-grid reveal">';
+  var certs=data.certifications||[];
+  for(var i=0;i<certs.length;i++)h+='<div class="cert-card"><div class="cert-icon">🏅</div><div><div class="cert-name">'+esc(certs[i].name)+'</div><div class="cert-org">'+esc(certs[i].org)+'</div></div></div>';
+  h+='</div></section>';
+
+  /* Achievements */
+  h+='<section class="section" id="projects"><div class="section-header reveal"><h2>Key Achievements</h2><div class="subtitle">Notable Projects &amp; Impact</div><div class="line"></div></div>';
+  h+='<div class="projects-grid">';
+  var achs=data.achievements||[];
+  for(var i=0;i<achs.length;i++){var a=achs[i];
+    h+='<div class="project-card reveal"><div class="project-icon">'+a.icon+'</div><h3>'+esc(a.title)+'</h3><p>'+esc(a.description)+'</p><div class="tech-stack">';
+    var aTags=a.tags||[];
+    for(var j=0;j<aTags.length;j++)h+='<span>'+esc(aTags[j])+'</span>';
+    h+='</div></div>';}
+  h+='</div></section>';
+
+  /* Languages */
+  h+='<section class="section" id="languages"><div class="section-header reveal"><h2>Languages</h2><div class="subtitle">Communication Skills</div><div class="line"></div></div>';
+  h+='<div class="languages-grid reveal">';
+  var langs=data.languages||[];
+  for(var i=0;i<langs.length;i++){var l=langs[i];
+    h+='<div class="lang-item"><div class="lang-name">'+esc(l.name)+'</div><div class="lang-level">'+esc(l.level)+'</div><div class="lang-dots">';
+    for(var d=1;d<=5;d++)h+='<div class="lang-dot'+(d<=l.dots?' filled':'')+'"></div>';
+    h+='</div></div>';}
+  h+='</div></section>';
+
+  /* Contact */
+  h+='<section class="section" id="contact"><div class="section-header reveal"><h2>Contact</h2><div class="subtitle">Let\'s Connect</div><div class="line"></div></div>';
+  h+='<div class="contact-grid"><div class="contact-info reveal">';
+  h+='<div class="contact-item"><div class="contact-icon">📧</div><div><div class="contact-label">Email</div><div class="contact-value"><a href="mailto:'+esc(p.email)+'">'+esc(p.email)+'</a></div></div></div>';
+  h+='<div class="contact-item"><div class="contact-icon">📞</div><div><div class="contact-label">Phone</div><div class="contact-value">'+esc(p.phone)+'</div></div></div>';
+  h+='<div class="contact-item"><div class="contact-icon">📍</div><div><div class="contact-label">Location</div><div class="contact-value">'+esc(p.location)+'</div></div></div>';
+  h+='<div class="contact-item"><div class="contact-icon">💼</div><div><div class="contact-label">LinkedIn</div><div class="contact-value"><a href="'+esc(p.linkedin)+'" target="_blank">'+esc(linkedinShort)+'</a></div></div></div>';
+  h+='<div class="contact-item"><div class="contact-icon">🏨</div><div><div class="contact-label">Current Role</div><div class="contact-value">'+esc(p.title)+'</div></div></div>';
+  h+='</div>';
+  h+='<form class="contact-form reveal" id="contactForm">';
+  h+='<div class="form-group"><input type="text" placeholder=" " required><label>Your Name</label></div>';
+  h+='<div class="form-group"><input type="email" placeholder=" " required><label>Your Email</label></div>';
+  h+='<div class="form-group"><input type="text" placeholder=" "><label>Subject</label></div>';
+  h+='<div class="form-group"><textarea placeholder=" " required></textarea><label>Message</label></div>';
+  h+='<button type="submit" class="btn btn-primary" style="align-self:flex-start">Send Message</button>';
+  h+='<div class="form-success" id="formSuccess">✓ Message sent successfully!</div>';
+  h+='</form></div></section>';
+
+  document.getElementById('mainContent').innerHTML=h;
+
+  /* Footer */
+  var fH='<div class="social-links">';
+  var socs=data.socialLinks||[];
+  for(var i=0;i<socs.length;i++)fH+='<a href="'+esc(socs[i].url)+'" title="'+esc(socs[i].label)+'" target="_blank">'+socs[i].icon+'</a>';
+  fH+='</div><p>© '+new Date().getFullYear()+' '+esc(p.firstName)+' '+esc(p.lastName)+' · Built with <span class="heart">♥</span></p>';
+  document.getElementById('footer').innerHTML=fH;
+
+  /* Init */
+  document.getElementById('loader').classList.add('hidden');
+  bindHovers();
+  initObservers();
+
+  /* Contact form handler */
+  document.getElementById('contactForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('formSuccess').style.display='block';e.target.reset();setTimeout(function(){document.getElementById('formSuccess').style.display='none'},3000)});
+
+  /* Project card tilt */
+  var pCards=document.querySelectorAll('.project-card');
+  for(var i=0;i<pCards.length;i++){(function(c){
+    c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect();var rx=(e.clientY-r.top-r.height/2)/20;var ry=(r.width/2-(e.clientX-r.left))/20;c.style.transform='perspective(1000px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-6px)'});
+    c.addEventListener('mouseleave',function(){c.style.transform=''});
+  })(pCards[i])}
+}
+
+buildCV();
+</script>
+</body>
+</html>}

@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Chantrea MEAS CV</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: #6c5ce7;
+  --primary-light: #a29bfe;
+  --gold: #d4a574;
+  --gold-light: #e8c99b;
+  --bg: #0f0f17;
+  --bg2: #16162a;
+  --card: #1c1c35;
+  --text: #e0e0e0;
+  --text-dim: #8892b0;
+  --text-bright: #ffffff;
+  --border: rgba(108, 92, 231, 0.2);
+  --success: #00cec9;
+  --danger: #e74c3c;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ====== Login Screen ====== */
+.login-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 2rem;
+}
+.login-box {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3rem; max-width: 420px; width: 100%;
+  text-align: center;
+}
+.login-box h1 {
+  font-size: 1.5rem; color: var(--gold-light); margin-bottom: 0.5rem;
+}
+.login-box p {
+  font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2rem;
+}
+.login-box input {
+  width: 100%; padding: 0.9rem 1rem; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: 0.95rem; margin-bottom: 1rem;
+  outline: none; transition: border-color 0.3s;
+}
+.login-box input:focus { border-color: var(--gold); }
+.login-box button {
+  width: 100%; padding: 0.9rem; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #d4a574, #e8c99b); color: #1a1a2e;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+.login-box button:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(212, 165, 116, 0.4); }
+.login-error { color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem; display: none; }
+
+/* ====== Admin Layout ====== */
+.admin-app { display: none; }
+.admin-app.active { display: flex; }
+
+.sidebar {
+  width: 260px; min-height: 100vh; background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0; position: fixed; left: 0; top: 0; overflow-y: auto;
+}
+.sidebar .sidebar-header {
+  padding: 1rem 1.5rem; margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar .sidebar-header h2 {
+  font-size: 1.1rem; color: var(--gold-light);
+}
+.sidebar .sidebar-header span {
+  font-size: 0.75rem; color: var(--text-dim);
+}
+
+.sidebar nav a {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.8rem 1.5rem; color: var(--text-dim); text-decoration: none;
+  font-size: 0.9rem; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.sidebar nav a:hover, .sidebar nav a.active {
+  color: var(--text-bright); background: rgba(108, 92, 231, 0.1);
+  border-left-color: var(--gold);
+}
+.sidebar nav a .nav-icon { font-size: 1.1rem; }
+
+.sidebar-footer {
+  padding: 1rem 1.5rem; margin-top: auto;
+  border-top: 1px solid var(--border);
+}
+.sidebar-footer button {
+  width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--danger); font-size: 0.85rem;
+  cursor: pointer; transition: 0.3s;
+}
+.sidebar-footer button:hover { background: rgba(231, 76, 60, 0.1); }
+
+.main-content {
+  margin-left: 260px; padding: 2rem; flex: 1; min-height: 100vh;
+}
+
+.main-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 2rem;
+}
+.main-header h1 { font-size: 1.6rem; color: var(--text-bright); }
+.main-header .actions { display: flex; gap: 0.8rem; }
+
+.btn {
+  padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.85rem;
+  font-weight: 500; cursor: pointer; transition: 0.3s; border: none;
+}
+.btn-save {
+  background: linear-gradient(135deg, #d4a574, #e8c99b); color: #1a1a2e;
+}
+.btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(212, 165, 116, 0.4); }
+.btn-preview {
+  background: rgba(108, 92, 231, 0.2); color: var(--primary-light);
+  border: 1px solid var(--primary);
+}
+.btn-preview:hover { background: rgba(108, 92, 231, 0.3); }
+
+/* ====== Section Panels ====== */
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;
+}
+.card-title {
+  font-size: 1rem; color: var(--gold-light); font-weight: 600;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+}
+
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block; font-size: 0.8rem; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;
+}
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 0.7rem 0.9rem; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 0.9rem; outline: none; transition: border-color 0.3s;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: var(--gold); }
+.form-group textarea { min-height: 80px; resize: vertical; }
+
+/* ====== List Editor (Experience, Education, etc.) ====== */
+.list-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem;
+  position: relative;
+}
+.list-item-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1rem;
+}
+.list-item-header h4 { font-size: 0.95rem; color: var(--text-bright); }
+.list-item-actions { display: flex; gap: 0.5rem; }
+
+.btn-sm {
+  padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem;
+  cursor: pointer; border: none; transition: 0.2s;
+}
+.btn-delete {
+  background: rgba(231, 76, 60, 0.15); color: var(--danger);
+}
+.btn-delete:hover { background: rgba(231, 76, 60, 0.3); }
+.btn-move {
+  background: rgba(108, 92, 231, 0.15); color: var(--primary-light);
+}
+.btn-move:hover { background: rgba(108, 92, 231, 0.3); }
+
+.btn-add {
+  padding: 0.7rem 1.2rem; border-radius: 8px; font-size: 0.85rem;
+  background: rgba(0, 206, 201, 0.1); color: var(--success);
+  border: 1px solid var(--success); cursor: pointer; transition: 0.3s;
+}
+.btn-add:hover { background: rgba(0, 206, 201, 0.2); }
+
+/* Bullet list editor */
+.bullet-list { list-style: none; }
+.bullet-list li {
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.bullet-list li input {
+  flex: 1; padding: 0.5rem 0.7rem; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 0.85rem; outline: none;
+}
+.bullet-list li input:focus { border-color: var(--gold); }
+
+/* Tech tags editor */
+.tags-editor {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;
+}
+.tag-chip {
+  display: flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.8rem; border-radius: 50px;
+  background: rgba(212, 165, 116, 0.15); color: var(--gold-light);
+  font-size: 0.8rem;
+}
+.tag-chip button {
+  background: none; border: none; color: var(--danger); cursor: pointer;
+  font-size: 0.9rem; line-height: 1;
+}
+.tags-input-row {
+  display: flex; gap: 0.5rem;
+}
+.tags-input-row input {
+  flex: 1; padding: 0.5rem 0.7rem; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 0.85rem; outline: none;
+}
+.tags-input-row button {
+  padding: 0.5rem 1rem; border-radius: 6px;
+  background: var(--gold); color: #1a1a2e; border: none;
+  font-size: 0.85rem; cursor: pointer;
+}
+
+/* Skill bar preview */
+.skill-bar-preview {
+  height: 6px; background: rgba(212, 165, 116, 0.1);
+  border-radius: 3px; margin-top: 0.3rem; overflow: hidden;
+}
+.skill-bar-preview-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(135deg, #d4a574, #e8c99b);
+  transition: width 0.3s;
+}
+
+/* Language dots */
+.lang-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(212, 165, 116, 0.2); cursor: pointer;
+  transition: 0.2s; display: inline-block; margin: 0 2px;
+}
+.lang-dot.filled { background: var(--gold); }
+
+/* Photo upload */
+.photo-upload {
+  display: flex; align-items: center; gap: 1.5rem;
+}
+.photo-preview {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: var(--bg); border: 2px dashed var(--border);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; font-size: 2rem; color: var(--text-dim);
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  padding: 1rem 1.5rem; border-radius: 10px;
+  background: var(--success); color: #0a0a0f;
+  font-weight: 600; font-size: 0.9rem;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error { background: var(--danger); color: white; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { width: 220px; }
+  .main-content { margin-left: 220px; }
+}
+@media (max-width: 600px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .mobile-toggle { display: block !important; }
+}
+.mobile-toggle {
+  display: none; position: fixed; top: 1rem; left: 1rem; z-index: 200;
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-size: 1.2rem; cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h1>🏨 CV Admin</h1>
+    <p>Enter your password to manage the CV</p>
+    <input type="password" id="loginPassword" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+    <button onclick="login()">Sign In</button>
+    <div class="login-error" id="loginError">Invalid password</div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="admin-app" id="adminApp">
+  <button class="mobile-toggle" onclick="document.querySelector('.sidebar').style.display=document.querySelector('.sidebar').style.display==='block'?'none':'block'">☰</button>
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>CV Admin Panel</h2>
+      <span>Chantrea MEAS</span>
+    </div>
+    <nav>
+      <a href="#" class="active" data-panel="personal"><span class="nav-icon">👤</span> Personal Info</a>
+      <a href="#" data-panel="stats"><span class="nav-icon">📊</span> Stats</a>
+      <a href="#" data-panel="skills"><span class="nav-icon">🛠</span> Skills</a>
+      <a href="#" data-panel="experience"><span class="nav-icon">💼</span> Experience</a>
+      <a href="#" data-panel="education"><span class="nav-icon">🎓</span> Education</a>
+      <a href="#" data-panel="certifications"><span class="nav-icon">🏅</span> Certifications</a>
+      <a href="#" data-panel="achievements"><span class="nav-icon">🏆</span> Achievements</a>
+      <a href="#" data-panel="languages"><span class="nav-icon">🌍</span> Languages</a>
+      <a href="#" data-panel="social"><span class="nav-icon">🔗</span> Social Links</a>
+      <a href="#" data-panel="settings"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- ====== Personal Info ====== -->
+    <div class="panel active" id="panel-personal">
+      <div class="main-header">
+        <h1>👤 Personal Information</h1>
+        <div class="actions">
+          <button class="btn btn-preview" onclick="window.open('/','_blank')">👁 Preview CV</button>
+          <button class="btn btn-save" onclick="saveSection('personal')">💾 Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📸 Profile Photo</div>
+        <div class="photo-upload">
+          <div class="photo-preview" id="photoPreview">👤</div>
+          <div>
+            <input type="file" accept="image/*" id="photoInput" onchange="uploadPhoto()">
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-top:0.3rem">JPG/PNG, max 5MB. Will be cropped to square.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 Basic Info</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="p-firstName">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="p-lastName">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Job Title</label>
+          <input type="text" id="p-title">
+        </div>
+        <div class="form-group">
+          <label>Summary (Hero Section)</label>
+          <textarea id="p-summary"></textarea>
+        </div>
+        <div class="form-group">
+          <label>About Paragraphs (one per line)</label>
+          <textarea id="p-about" style="min-height:140px"></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📬 Contact Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="p-email">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="p-phone">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="p-location">
+          </div>
+          <div class="form-group">
+            <label>LinkedIn URL</label>
+            <input type="text" id="p-linkedin">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Availability</label>
+            <input type="text" id="p-availability">
+          </div>
+          <div class="form-group">
+            <label>Specialization</label>
+            <input type="text" id="p-specialization">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Stats ====== -->
+    <div class="panel" id="panel-stats">
+      <div class="main-header">
+        <h1>📊 Key Statistics</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('stats')">💾 Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="statsList"></div>
+        <button class="btn-add" onclick="addStat()" style="margin-top:1rem">+ Add Stat</button>
+      </div>
+    </div>
+
+    <!-- ====== Skills ====== -->
+    <div class="panel" id="panel-skills">
+      <div class="main-header">
+        <h1>🛠 Skills</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('skills')">💾 Save</button>
+        </div>
+      </div>
+      <div id="skillsList"></div>
+      <button class="btn-add" onclick="addSkillCategory()" style="margin-top:1rem">+ Add Skill Category</button>
+      <div class="card" style="margin-top:1.5rem">
+        <div class="card-title">🏷️ Technology Tags</div>
+        <div class="tags-editor" id="techTagsEditor"></div>
+        <div class="tags-input-row">
+          <input type="text" id="newTagInput" placeholder="New tag..." onkeydown="if(event.key==='Enter')addTag()">
+          <button onclick="addTag()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== Experience ====== -->
+    <div class="panel" id="panel-experience">
+      <div class="main-header">
+        <h1>💼 Experience</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('experience')">💾 Save</button>
+        </div>
+      </div>
+      <div id="experienceList"></div>
+      <button class="btn-add" onclick="addExperience()" style="margin-top:1rem">+ Add Position</button>
+    </div>
+
+    <!-- ====== Education ====== -->
+    <div class="panel" id="panel-education">
+      <div class="main-header">
+        <h1>🎓 Education</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('education')">💾 Save</button>
+        </div>
+      </div>
+      <div id="educationList"></div>
+      <button class="btn-add" onclick="addEducation()" style="margin-top:1rem">+ Add Education</button>
+    </div>
+
+    <!-- ====== Certifications ====== -->
+    <div class="panel" id="panel-certifications">
+      <div class="main-header">
+        <h1>🏅 Certifications</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('certifications')">💾 Save</button>
+        </div>
+      </div>
+      <div id="certificationsList"></div>
+      <button class="btn-add" onclick="addCert()" style="margin-top:1rem">+ Add Certification</button>
+    </div>
+
+    <!-- ====== Achievements ====== -->
+    <div class="panel" id="panel-achievements">
+      <div class="main-header">
+        <h1>🏆 Key Achievements</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('achievements')">💾 Save</button>
+        </div>
+      </div>
+      <div id="achievementsList"></div>
+      <button class="btn-add" onclick="addAchievement()" style="margin-top:1rem">+ Add Achievement</button>
+    </div>
+
+    <!-- ====== Languages ====== -->
+    <div class="panel" id="panel-languages">
+      <div class="main-header">
+        <h1>🌍 Languages</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('languages')">💾 Save</button>
+        </div>
+      </div>
+      <div id="languagesList"></div>
+      <button class="btn-add" onclick="addLanguage()" style="margin-top:1rem">+ Add Language</button>
+    </div>
+
+    <!-- ====== Social Links ====== -->
+    <div class="panel" id="panel-social">
+      <div class="main-header">
+        <h1>🔗 Social Links</h1>
+        <div class="actions">
+          <button class="btn btn-save" onclick="saveSection('social')">💾 Save</button>
+        </div>
+      </div>
+      <div id="socialList"></div>
+      <button class="btn-add" onclick="addSocial()" style="margin-top:1rem">+ Add Social Link</button>
+    </div>
+
+    <!-- ====== Settings ====== -->
+    <div class="panel" id="panel-settings">
+      <div class="main-header">
+        <h1>⚙️ Settings</h1>
+      </div>
+      <div class="card">
+        <div class="card-title">🔑 Change Password</div>
+        <div class="form-group">
+          <label>New Password (min 6 characters)</label>
+          <input type="password" id="newPassword">
+        </div>
+        <button class="btn btn-save" onclick="changePassword()">Update Password</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📤 Export / Import Data</div>
+        <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem">Download all CV data as JSON or import from a file.</p>
+        <div style="display:flex;gap:0.8rem">
+          <button class="btn btn-preview" onclick="exportData()">⬇️ Export JSON</button>
+          <label class="btn btn-preview" style="cursor:pointer">⬆️ Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+let TOKEN = localStorage.getItem('cv_token') || '';
+let cvData = {};
+
+// ====== Toast ======
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ====== Auth ======
+async function login() {
+  const pw = document.getElementById('loginPassword').value;
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      TOKEN = data.token;
+      localStorage.setItem('cv_token', TOKEN);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminApp').classList.add('active');
+      loadCV();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  } catch (e) {
+    showToast('Connection error', true);
+  }
+}
+
+function logout() {
+  TOKEN = '';
+  localStorage.removeItem('cv_token');
+  location.reload();
+}
+
+async function api(method, path, body) {
+  const opts = {
+    method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch('/api/cv' + path, opts);
+  if (res.status === 401) { logout(); return null; }
+  return res.json();
+}
+
+// ====== Load ======
+async function loadCV() {
+  const res = await fetch('/api/cv');
+  cvData = await res.json();
+  renderAll();
+}
+
+// ====== Sidebar Navigation ======
+document.querySelectorAll('.sidebar nav a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar nav a').forEach(n => n.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + a.dataset.panel).classList.add('active');
+  });
+});
+
+// ====== Render All ======
+function renderAll() {
+  renderPersonal();
+  renderStats();
+  renderSkills();
+  renderExperience();
+  renderEducation();
+  renderCerts();
+  renderAchievements();
+  renderLanguages();
+  renderSocial();
+}
+
+// ====== Personal ======
+function renderPersonal() {
+  const p = cvData.personal || {};
+  document.getElementById('p-firstName').value = p.firstName || '';
+  document.getElementById('p-lastName').value = p.lastName || '';
+  document.getElementById('p-title').value = p.title || '';
+  document.getElementById('p-summary').value = p.summary || '';
+  document.getElementById('p-about').value = (p.about || []).join('\n');
+  document.getElementById('p-email').value = p.email || '';
+  document.getElementById('p-phone').value = p.phone || '';
+  document.getElementById('p-location').value = p.location || '';
+  document.getElementById('p-linkedin').value = p.linkedin || '';
+  document.getElementById('p-availability').value = p.availability || '';
+  document.getElementById('p-specialization').value = p.specialization || '';
+  if (p.profilePhoto) {
+    document.getElementById('photoPreview').innerHTML = '<img src="' + p.profilePhoto + '">';
+  }
+}
+
+// ====== Stats ======
+function renderStats() {
+  const el = document.getElementById('statsList');
+  const stats = cvData.stats || [];
+  el.innerHTML = stats.map((s, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${s.label}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="removeStat(${i})">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Label</label><input type="text" value="${s.label}" onchange="cvData.stats[${i}].label=this.value"></div>
+        <div class="form-group"><label>Value</label><input type="number" value="${s.value}" onchange="cvData.stats[${i}].value=parseInt(this.value)"></div>
+      </div>
+      <div class="form-group"><label>Suffix (e.g. +)</label><input type="text" value="${s.suffix||''}" onchange="cvData.stats[${i}].suffix=this.value"></div>
+    </div>
+  `).join('');
+}
+function addStat() { cvData.stats = cvData.stats || []; cvData.stats.push({label:'',value:0,suffix:'+'}); renderStats(); }
+function removeStat(i) { cvData.stats.splice(i,1); renderStats(); }
+
+// ====== Skills ======
+function renderSkills() {
+  const el = document.getElementById('skillsList');
+  const skills = cvData.skills || [];
+  el.innerHTML = skills.map((cat, i) => `
+    <div class="card">
+      <div class="list-item-header">
+        <div class="card-title">${cat.icon} ${cat.category}</div>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="removeSkillCategory(${i})">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Category Name</label><input type="text" value="${cat.category}" onchange="cvData.skills[${i}].category=this.value"></div>
+        <div class="form-group"><label>Icon (emoji)</label><input type="text" value="${cat.icon}" onchange="cvData.skills[${i}].icon=this.value"></div>
+      </div>
+      ${(cat.items||[]).map((sk,j) => `
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem">
+          <input type="text" value="${sk.name}" style="flex:2" onchange="cvData.skills[${i}].items[${j}].name=this.value">
+          <input type="number" value="${sk.level}" style="flex:1;max-width:70px" min="0" max="100" onchange="cvData.skills[${i}].items[${j}].level=parseInt(this.value)">
+          <div class="skill-bar-preview" style="flex:1"><div class="skill-bar-preview-fill" style="width:${sk.level}%"></div></div>
+          <button class="btn-sm btn-delete" onclick="cvData.skills[${i}].items.splice(${j},1);renderSkills()">✕</button>
+        </div>
+      `).join('')}
+      <button class="btn-add" onclick="cvData.skills[${i}].items.push({name:'',level:50});renderSkills()" style="margin-top:0.5rem">+ Add Skill</button>
+    </div>
+  `).join('');
+
+  // Tech tags
+  const tags = cvData.techTags || [];
+  document.getElementById('techTagsEditor').innerHTML = tags.map((t,i) =>
+    `<span class="tag-chip">${t}<button onclick="cvData.techTags.splice(${i},1);renderSkills()">×</button></span>`
+  ).join('');
+}
+function addSkillCategory() { cvData.skills = cvData.skills || []; cvData.skills.push({category:'',icon:'💻',items:[]}); renderSkills(); }
+function removeSkillCategory(i) { cvData.skills.splice(i,1); renderSkills(); }
+function addTag() {
+  const input = document.getElementById('newTagInput');
+  if (input.value.trim()) {
+    cvData.techTags = cvData.techTags || [];
+    cvData.techTags.push(input.value.trim());
+    input.value = '';
+    renderSkills();
+  }
+}
+
+// ====== Experience ======
+function renderExperience() {
+  const el = document.getElementById('experienceList');
+  const exps = cvData.experience || [];
+  el.innerHTML = exps.map((exp, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${exp.title} — ${exp.company}</h4>
+        <div class="list-item-actions">
+          ${i>0?`<button class="btn-sm btn-move" onclick="moveItem(cvData.experience,${i},-1)">↑</button>`:''}
+          ${i<exps.length-1?`<button class="btn-sm btn-move" onclick="moveItem(cvData.experience,${i},1)">↓</button>`:''}
+          <button class="btn-sm btn-delete" onclick="cvData.experience.splice(${i},1);renderExperience()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Date Range</label><input type="text" value="${exp.date}" onchange="cvData.experience[${i}].date=this.value"></div>
+        <div class="form-group"><label>Job Title</label><input type="text" value="${exp.title}" onchange="cvData.experience[${i}].title=this.value"></div>
+      </div>
+      <div class="form-group"><label>Company · Location</label><input type="text" value="${exp.company}" onchange="cvData.experience[${i}].company=this.value"></div>
+      <label style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin:0.5rem 0;display:block">Bullet Points</label>
+      <ul class="bullet-list">
+        ${(exp.bullets||[]).map((b,j) => `
+          <li><input type="text" value="${b}" onchange="cvData.experience[${i}].bullets[${j}]=this.value"><button class="btn-sm btn-delete" onclick="cvData.experience[${i}].bullets.splice(${j},1);renderExperience()">✕</button></li>
+        `).join('')}
+      </ul>
+      <button class="btn-add" onclick="cvData.experience[${i}].bullets.push('');renderExperience()" style="margin-top:0.3rem">+ Add Bullet</button>
+    </div>
+  `).join('');
+}
+function addExperience() { cvData.experience = cvData.experience || []; cvData.experience.push({date:'',title:'',company:'',bullets:[]}); renderExperience(); }
+function moveItem(arr, i, dir) { [arr[i],arr[i+dir]] = [arr[i+dir],arr[i]]; renderAll(); }
+
+// ====== Education ======
+function renderEducation() {
+  const el = document.getElementById('educationList');
+  const edu = cvData.education || [];
+  el.innerHTML = edu.map((e, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${e.degree}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="cvData.education.splice(${i},1);renderEducation()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Year</label><input type="text" value="${e.year}" onchange="cvData.education[${i}].year=this.value"></div>
+        <div class="form-group"><label>Degree</label><input type="text" value="${e.degree}" onchange="cvData.education[${i}].degree=this.value"></div>
+      </div>
+      <div class="form-group"><label>School</label><input type="text" value="${e.school}" onchange="cvData.education[${i}].school=this.value"></div>
+      <div class="form-group"><label>Description</label><textarea onchange="cvData.education[${i}].description=this.value">${e.description||''}</textarea></div>
+    </div>
+  `).join('');
+}
+function addEducation() { cvData.education = cvData.education || []; cvData.education.push({year:'',degree:'',school:'',description:''}); renderEducation(); }
+
+// ====== Certifications ======
+function renderCerts() {
+  const el = document.getElementById('certificationsList');
+  const certs = cvData.certifications || [];
+  el.innerHTML = certs.map((c, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>🏅 ${c.name}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="cvData.certifications.splice(${i},1);renderCerts()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Certification Name</label><input type="text" value="${c.name}" onchange="cvData.certifications[${i}].name=this.value"></div>
+        <div class="form-group"><label>Organization · Year</label><input type="text" value="${c.org}" onchange="cvData.certifications[${i}].org=this.value"></div>
+      </div>
+    </div>
+  `).join('');
+}
+function addCert() { cvData.certifications = cvData.certifications || []; cvData.certifications.push({name:'',org:''}); renderCerts(); }
+
+// ====== Achievements ======
+function renderAchievements() {
+  const el = document.getElementById('achievementsList');
+  const achs = cvData.achievements || [];
+  el.innerHTML = achs.map((a, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${a.icon} ${a.title}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="cvData.achievements.splice(${i},1);renderAchievements()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input type="text" value="${a.title}" onchange="cvData.achievements[${i}].title=this.value"></div>
+        <div class="form-group"><label>Icon (emoji)</label><input type="text" value="${a.icon}" onchange="cvData.achievements[${i}].icon=this.value"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea onchange="cvData.achievements[${i}].description=this.value">${a.description||''}</textarea></div>
+      <label style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;margin:0.5rem 0;display:block">Tags</label>
+      <div class="tags-editor">${(a.tags||[]).map((t,j) =>
+        `<span class="tag-chip">${t}<button onclick="cvData.achievements[${i}].tags.splice(${j},1);renderAchievements()">×</button></span>`
+      ).join('')}</div>
+      <div class="tags-input-row" style="margin-top:0.5rem">
+        <input type="text" id="achTag${i}" placeholder="Add tag..." onkeydown="if(event.key==='Enter'){cvData.achievements[${i}].tags.push(this.value);this.value='';renderAchievements()}">
+        <button onclick="const inp=document.getElementById('achTag${i}');if(inp.value.trim()){cvData.achievements[${i}].tags=cvData.achievements[${i}].tags||[];cvData.achievements[${i}].tags.push(inp.value.trim());inp.value='';renderAchievements()}">Add</button>
+      </div>
+    </div>
+  `).join('');
+}
+function addAchievement() { cvData.achievements = cvData.achievements || []; cvData.achievements.push({icon:'🏆',title:'',description:'',tags:[]}); renderAchievements(); }
+
+// ====== Languages ======
+function renderLanguages() {
+  const el = document.getElementById('languagesList');
+  const langs = cvData.languages || [];
+  el.innerHTML = langs.map((l, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${l.name}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="cvData.languages.splice(${i},1);renderLanguages()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Language</label><input type="text" value="${l.name}" onchange="cvData.languages[${i}].name=this.value"></div>
+        <div class="form-group"><label>Level</label><input type="text" value="${l.level}" onchange="cvData.languages[${i}].level=this.value"></div>
+      </div>
+      <label style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;margin:0.5rem 0;display:block">Proficiency (click dots)</label>
+      <div>${[1,2,3,4,5].map(d =>
+        `<span class="lang-dot${d<=l.dots?' filled':''}" onclick="cvData.languages[${i}].dots=${d};renderLanguages()"></span>`
+      ).join('')}</div>
+    </div>
+  `).join('');
+}
+function addLanguage() { cvData.languages = cvData.languages || []; cvData.languages.push({name:'',level:'',dots:3}); renderLanguages(); }
+
+// ====== Social Links ======
+function renderSocial() {
+  const el = document.getElementById('socialList');
+  const links = cvData.socialLinks || [];
+  el.innerHTML = links.map((l, i) => `
+    <div class="list-item">
+      <div class="list-item-header">
+        <h4>${l.icon} ${l.label}</h4>
+        <div class="list-item-actions">
+          <button class="btn-sm btn-delete" onclick="cvData.socialLinks.splice(${i},1);renderSocial()">✕</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Icon (emoji)</label><input type="text" value="${l.icon}" onchange="cvData.socialLinks[${i}].icon=this.value"></div>
+        <div class="form-group"><label>Label</label><input type="text" value="${l.label}" onchange="cvData.socialLinks[${i}].label=this.value"></div>
+      </div>
+      <div class="form-group"><label>URL</label><input type="text" value="${l.url}" onchange="cvData.socialLinks[${i}].url=this.value"></div>
+    </div>
+  `).join('');
+}
+function addSocial() { cvData.socialLinks = cvData.socialLinks || []; cvData.socialLinks.push({icon:'🔗',label:'',url:''}); renderSocial(); }
+
+// ====== Save Section ======
+async function saveSection(section) {
+  let data, path;
+  switch(section) {
+    case 'personal':
+      data = {
+        firstName: document.getElementById('p-firstName').value,
+        lastName: document.getElementById('p-lastName').value,
+        title: document.getElementById('p-title').value,
+        summary: document.getElementById('p-summary').value,
+        about: document.getElementById('p-about').value.split('\n').filter(l=>l.trim()),
+        email: document.getElementById('p-email').value,
+        phone: document.getElementById('p-phone').value,
+        location: document.getElementById('p-location').value,
+        linkedin: document.getElementById('p-linkedin').value,
+        availability: document.getElementById('p-availability').value,
+        specialization: document.getElementById('p-specialization').value,
+        profilePhoto: cvData.personal.profilePhoto || ''
+      };
+      path = '/personal'; break;
+    case 'stats': data = cvData.stats; path = '/stats'; break;
+    case 'skills':
+      data = { skills: cvData.skills, techTags: cvData.techTags };
+      // Save both in one go via full update
+      cvData.skills = data.skills;
+      cvData.techTags = data.techTags;
+      await api('PUT', '', cvData);
+      showToast('Skills saved!');
+      return;
+    case 'experience': data = cvData.experience; path = '/experience'; break;
+    case 'education': data = cvData.education; path = '/education'; break;
+    case 'certifications': data = cvData.certifications; path = '/certifications'; break;
+    case 'achievements': data = cvData.achievements; path = '/achievements'; break;
+    case 'languages': data = cvData.languages; path = '/languages'; break;
+    case 'social': data = cvData.socialLinks; path = '/social-links'; break;
+  }
+  const res = await api('PUT', path, data);
+  if (res) showToast('Saved!');
+  else showToast('Error saving', true);
+}
+
+// ====== Photo Upload ======
+async function uploadPhoto() {
+  const file = document.getElementById('photoInput').files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('photo', file);
+  try {
+    const res = await fetch('/api/cv/photo', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + TOKEN },
+      body: formData
+    });
+    const data = await res.json();
+    // Handle both URL and base64 data URL responses
+    const photoSrc = data.url || (data.stored === 'base64' ? cvData.personal.profilePhoto : '');
+    if (photoSrc) {
+      cvData.personal.profilePhoto = photoSrc;
+      document.getElementById('photoPreview').innerHTML = '<img src="' + photoSrc + '">';
+      showToast('Photo uploaded!');
+    } else {
+      showToast(data.error || 'Upload failed', true);
+    }
+  } catch (e) {
+    showToast('Upload error', true);
+  }
+}
+
+// ====== Change Password ======
+async function changePassword() {
+  const pw = document.getElementById('newPassword').value;
+  if (pw.length < 6) return showToast('Password too short', true);
+  const res = await fetch('/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+    body: JSON.stringify({ newPassword: pw })
+  });
+  const data = await res.json();
+  if (data.token) {
+    TOKEN = data.token;
+    localStorage.setItem('cv_token', TOKEN);
+    showToast('Password changed!');
+  } else {
+    showToast(data.error || 'Failed', true);
+  }
+}
+
+// ====== Export / Import ======
+function exportData() {
+  const blob = new Blob([JSON.stringify(cvData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'cv-data.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported!');
+}
+
+async function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  try {
+    cvData = JSON.parse(text);
+    await api('PUT', '', cvData);
+    renderAll();
+    showToast('Data imported!');
+  } catch (err) {
+    showToast('Invalid JSON file', true);
+  }
+}
+
+// ====== Auto-check auth ======
+if (TOKEN) {
+  fetch('/api/cv', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(res => {
+      if (res.ok) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminApp').classList.add('active');
+        loadCV();
+      } else {
+        localStorage.removeItem('cv_token');
+        TOKEN = '';
+      }
+    })
+    .catch(() => {});
+}
+</script>
+</body>
+</html>
