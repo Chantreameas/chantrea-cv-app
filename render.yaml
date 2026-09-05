@@ -1,11 +1,15 @@
 services:
   - type: web
-    name: chantrea-cv
+    name: chantrea-cv-app
     runtime: node
+    plan: free
+    region: singapore
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
-      - key: ADMIN_PASSWORD
-        sync: false
       - key: NODE_VERSION
         value: "20"
+      - key: ADMIN_PASSWORD
+        sync: false
